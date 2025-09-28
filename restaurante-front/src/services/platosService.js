@@ -2,7 +2,7 @@ import api from "./api";
 
 const platosService =  {
 
-    listPaged: ({page=1, limit=10, q=''}) => api.get('productos', {params: {page, limit, q}}),
+    listPaged: ({page=1, limit=10, q=''}) => api.get('platos', {params: {page, limit, q}}),
 
     list: () => api.get('platos'),
     // get: (id) => api-get(`platos/${id}`),

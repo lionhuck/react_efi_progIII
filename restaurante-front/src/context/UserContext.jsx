@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-//!USAR YUP CON NOTIFY DE UTLIS
+//!USAR TOAST CON NOTIFY DE UTLIS
 
 //Ya no uso axios y uso el usersService
 import usersService from "../services/usersService";

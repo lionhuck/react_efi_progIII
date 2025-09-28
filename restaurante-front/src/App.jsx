@@ -6,7 +6,36 @@ import './App.css';
 
 import { Fragment } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { Toast } from 'primereact/toast';
+import { TOAST_REF } from './utils/ToastRef';
 
-import { PlatosProvider } from './context/platosContext';
+import { AuthProvider } from './context/AuthContext';
+// import AuthModule from './layouts/auth';
 
+import { PlatosProvider } from './context/PlatosContext';
+import PlatosModule from './layouts/platos';
 
+function App() {
+    return (
+        <BrowserRouter>
+            <Toast ref={TOAST_REF} position='top-right' />
+            <AuthProvider>  
+                <Fragment>
+
+                {/* <MenuBar />
+                <IndexModule /> */}
+
+                {/* <AuthModule /> */}
+            
+                <PlatosProvider>
+                    <PlatosModule />
+                </PlatosProvider>
+
+    
+                </Fragment>
+            </AuthProvider>
+        </BrowserRouter>
+    );
+}
+
+export default App;

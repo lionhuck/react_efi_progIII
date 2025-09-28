@@ -13,7 +13,7 @@ export const notifyInfo = (message) => {
     }
 };
 
-export const notifySuccess = (message) => {
+export const notifySucces = (message) => {
     if (TOAST_REF.current) {
         TOAST_REF.current.show({
         severity: "success",
