@@ -43,7 +43,10 @@ export const PlatosProvider = ({ children }) => {
     const createPlato = async (newPlato) => {
         setLoading(true);
         try {
-            const {data: response} = await platosService.create(newPlato);
+            const {data: response} = await platosService.create({
+                ...newPlato,
+                disponibilidad: newPlato.disponibilidad ?? true, // fuerza boolean
+                });
             const created = Array.isArray(response.data) ? response.data[0] : response.data || response;
             setPlatos(prev => Array.isArray(prev) ? [...prev, created] : [created]);
             notifySucces(response.message || "Plato creado con exito ✅");

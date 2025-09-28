@@ -1,5 +1,5 @@
 import PlatosView from "./PlatosView";
-//import PlatosForm from "./PlatosForm";
+import PlatosForm from "./PlatosForm";
 import  {Routes, Route} from 'react-router-dom';
 
 
@@ -16,11 +16,11 @@ const PlatosModule = () => {
                     } 
                 />
 
-                {/* <Route 
+                <Route 
                     path="/platos/crear" 
                     element={
                         // <PrivateRoute>
-                            <ProductForm/>
+                            <PlatosForm/>
                         // </PrivateRoute>
                     } 
                 />
@@ -29,10 +29,10 @@ const PlatosModule = () => {
                     path="/platos/editar/:id" 
                     element={
                         // <PrivateRoute>
-                            <ProductForm />
+                            <PlatosForm />
                         // </PrivateRoute>
                     } 
-                /> */}
+                />
             </Routes>
     
     )
