@@ -1,12 +1,12 @@
 import { createContext, useState, useEffect } from "react";
 import { notifyInfo, notifyError, notifySucces } from "../utils/Notifier";
-import platosService from "../services/platosService";
+import mesasService from "../services/mesasService";
 
-export const PlatosContext = createContext();
+export const MesasContext = createContext();
 
-export const PlatosProvider = ({ children }) => {
-    const [platos, setPlatos] = useState([]);
-    const [editingPlato, setEditingPlato] = useState(null);
+export const MesasProvider = ({ children }) => {
+    const [mesas, setMesas] = useState([]);
+    const [editingMesa, setEditingMesa] = useState(null);
     const [loading, setLoading] = useState(false);
     // const [error, setError] = useState(null);
     const [lazy, setLazy] = useState({
@@ -16,37 +16,37 @@ export const PlatosProvider = ({ children }) => {
         q: '',
     });
 
-    const getPlatos = async () => {
+    const getMesas = async () => {
         setLoading(true);
         try {
             const page = lazy.page + 1;
             const limit = lazy.rows;
             const q = lazy.q || '';
 
-            const {data: response} = await platosService.listPaged({page, limit, q});
-            setPlatos(Array.isArray(response.data) ? response.data : []);
-            // setPlatos(Array.isArray(response) ? response : response.data || []);
+            const {data: response} = await mesasService.listPaged({page, limit, q});
+            // setMesas(Array.isArray(response.data) ? response.data : []);
+            setMesas(Array.isArray(response) ? response : response.data || []);
         } catch (error) {
-            notifyError(error.response?.data?.message || error.message || "Error al obtener plato ❌");
+            notifyError(error.response?.data?.message || error.message || "Error al obtener mesa ❌");
             // setError(error.response?.data?.message || error.message);
             console.error("axios GET error:", error);
-            setPlatos([]);
+            setMesas([]);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        getPlatos();
+        getMesas();
     }, [lazy.page, lazy.rows, lazy.q]);
 
 
     const toggleDisponibilidad = async (id, valor) => {
         setLoading(true);
         try {
-            const { data: response } = await platosService.update(id, { disponibilidad: valor });
-            setPlatos(prev =>
-            prev.map(p => (p.id === id ? { ...p, disponibilidad: valor } : p))
+            const { data: response } = await mesasService.update(id, { disponible: valor });
+            setMesas(prev =>
+            prev.map(p => (p.id === id ? { ...p, disponible: valor } : p))
             );
             notifySucces(response.message || "Disponibilidad actualizada ✅");
             return true;
@@ -59,20 +59,20 @@ export const PlatosProvider = ({ children }) => {
     };
 
 
-    const createPlato = async (newPlato) => {
+    const createMesa = async (newMesa) => {
         setLoading(true);
         try {
-            const {data: response} = await platosService.create({
-                ...newPlato,
-                disponibilidad: newPlato.disponibilidad ?? true, // fuerza boolean
+            const {data: response} = await mesasService.create({
+                ...newMesa,
+                disponible: newMesa.disponible ?? true, // fuerza boolean
                 });
             const created = Array.isArray(response.data) ? response.data[0] : response.data || response;
-            setPlatos(prev => Array.isArray(prev) ? [...prev, created] : [created]);
-            notifySucces(response.message || "Plato creado con exito ✅");
+            setMesas(prev => Array.isArray(prev) ? [...prev, created] : [created]);
+            notifySucces(response.message || "Mesa creada con exito ✅");
             return true;
         } catch (error) {
             // setError(error.response?.data?.message || error.message);
-            notifyError(error.response?.data?.message || error.message || "Error al crear plato ❌");
+            notifyError(error.response?.data?.message || error.message || "Error al crear mesa ❌");
             console.error("Axios POST error:", error);
             return false;
         } finally {
@@ -80,16 +80,16 @@ export const PlatosProvider = ({ children }) => {
         }
     };
 
-    const deletePlato = async (id) => {
+    const deleteMesa = async (id) => {
         setLoading(true);
         try {
-            const {data: response} = await platosService.delete(id);
-            setPlatos(prev => prev.filter(p => p.id !== id));
-            notifySucces(response.message || "Plato eliminado con exito ✅");
+            const {data: response} = await mesasService.delete(id);
+            setMesas(prev => prev.filter(p => p.id !== id));
+            notifySucces(response.message || "Mesa eliminada con exito ✅");
             return true;
         } catch (error) {
             // setError(error.response?.data?.message || error.message);
-            notifyError(error.response?.data?.message || error.message || "Error al eliminar plato ❌");
+            notifyError(error.response?.data?.message || error.message || "Error al eliminar mesa ❌");
             console.error("Axios DELETE error:", error);
             return false;
         } finally {
@@ -97,19 +97,19 @@ export const PlatosProvider = ({ children }) => {
         }
     };
 
-    const editPlato = async (updated) => {
+    const editMesa = async (updated) => {
         setLoading(true);
         try {
-            const id = editingPlato.id;
-            const {data: response} = await platosService.update(id, updated);
-            setPlatos(prev =>
+            const id = editingMesa.id;
+            const {data: response} = await mesasService.update(id, updated);
+            setMesas(prev =>
                 prev.map(p => (p.id === id ? { ...updated, id } : p))
             )
-            notifySucces(response.message || "Plato actualizado con exito ✅");
+            notifySucces(response.message || "Mesa actualizado con exito ✅");
             return true;
         } catch (error) {
             // setError(error.response?.data?.message || error.message);
-            notifyError(error.response?.data?.message || error.message || "Error al actualizar plato ❌");
+            notifyError(error.response?.data?.message || error.message || "Error al actualizar mesa ❌");
             console.error("Axios PUT error:", error);
             return false;
         } finally {
@@ -118,9 +118,9 @@ export const PlatosProvider = ({ children }) => {
     };
 
     return (
-        <PlatosContext.Provider value={{ platos, setPlatos, editingPlato, setEditingPlato, loading, setLoading, lazy, setLazy, getPlatos, createPlato, deletePlato, editPlato, toggleDisponibilidad }}>
+        <MesasContext.Provider value={{ mesas, setMesas, editingMesa, setEditingMesa, loading, setLoading, lazy, setLazy, getMesas, createMesa, deleteMesa, editMesa, toggleDisponibilidad }}>
             {children}
-        </PlatosContext.Provider>
+        </MesasContext.Provider>
     );
 };
             

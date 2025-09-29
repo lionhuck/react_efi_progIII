@@ -15,6 +15,9 @@ import { AuthProvider } from './context/AuthContext';
 import { PlatosProvider } from './context/PlatosContext';
 import PlatosModule from './layouts/platos';
 
+import { MesasProvider } from './context/MesasContext';
+import MesasModule from './layouts/mesas';
+
 function App() {
     return (
         <BrowserRouter>
@@ -31,6 +34,9 @@ function App() {
                     <PlatosModule />
                 </PlatosProvider>
 
+                <MesasProvider>
+                    <MesasModule />
+                </MesasProvider>
     
                 </Fragment>
             </AuthProvider>
