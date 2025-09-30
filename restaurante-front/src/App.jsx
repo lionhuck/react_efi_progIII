@@ -18,6 +18,9 @@ import PlatosModule from './layouts/platos';
 import { MesasProvider } from './context/MesasContext';
 import MesasModule from './layouts/mesas';
 
+import { PedidosProvider } from './context/PedidosContext';
+import PedidosModule from './layouts/pedidos';
+
 function App() {
     return (
         <BrowserRouter>
@@ -37,6 +40,10 @@ function App() {
                 <MesasProvider>
                     <MesasModule />
                 </MesasProvider>
+
+                <PedidosProvider>
+                    <PedidosModule />
+                </PedidosProvider>
     
                 </Fragment>
             </AuthProvider>

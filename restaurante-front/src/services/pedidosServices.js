@@ -8,7 +8,7 @@ const pedidosServices =  {
     // get: (id) => api-get(`pedidos/${id}`),
     create: (payload) => api.post('pedidos', payload),
     update: (id, payload) => api.put(`pedidos/${id}`, payload),
-    delete: (id) => api.delete(`pedidos/${id}`)
+    cancel: (id) => api.put(`pedidos/${id}/cancel`),
 }
 
 export default pedidosServices
