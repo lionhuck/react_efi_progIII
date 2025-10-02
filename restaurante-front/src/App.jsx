@@ -5,12 +5,20 @@ import './App.css';
 
 
 import { Fragment } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toast } from 'primereact/toast';
 import { TOAST_REF } from './utils/ToastRef';
 
 import { AuthProvider } from './context/AuthContext';
 // import AuthModule from './layouts/auth';
+
+import LoginForm from "./components/auth/LoginForm";
+import RegisterForm from "./components/auth/RegisterForm";
+import ForgotPassword from "./components/auth/ForgotPassword";
+import ResetPassword from "./components/auth/ResetPassword";
+import EditProfile from "./components/auth/EditProfile";
+import PrivateRoute from "./components/PrivateRoute";
+
 
 import { PlatosProvider } from './context/PlatosContext';
 import PlatosModule from './layouts/platos';
@@ -24,27 +32,63 @@ import PedidosModule from './layouts/pedidos';
 function App() {
     return (
         <BrowserRouter>
-            <Toast ref={TOAST_REF} position='top-right' />
+            <Toast ref={TOAST_REF} position="top-right" />
             <AuthProvider>  
                 <Fragment>
 
-                {/* <MenuBar />
-                <IndexModule /> */}
+                    {/* <MenuBar />
+                    <IndexModule /> */}
 
-                {/* <AuthModule /> */}
-            
-                <PlatosProvider>
-                    <PlatosModule />
-                </PlatosProvider>
+                    {/* <AuthModule /> */}
 
-                <MesasProvider>
-                    <MesasModule />
-                </MesasProvider>
+                    {/* --- RUTAS PÚBLICAS / PRIVADAS --- */}
+                    <Routes>
+                        {/* RUTAS PÚBLICAS */}
+                        <Route path="/login" element={<LoginForm />} />
+                        <Route path="/register" element={<RegisterForm />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset/:id/:token" element={<ResetPassword />} />
 
-                <PedidosProvider>
-                    <PedidosModule />
-                </PedidosProvider>
-    
+                        {/* RUTA PRIVADA */}
+                        <Route
+                            path="/mi-perfil/editar"
+                            element={
+                                <PrivateRoute>
+                                    <EditProfile />
+                                </PrivateRoute>
+                            }
+                        />
+
+                        {/* RUTAS DE MÓDULOS YA EXISTENTES */}
+                        <Route
+                            path="/platos/*"
+                            element={
+                                <PlatosProvider>
+                                    <PlatosModule />
+                                </PlatosProvider>
+                            }
+                        />
+                        <Route
+                            path="/mesas/*"
+                            element={
+                                <MesasProvider>
+                                    <MesasModule />
+                                </MesasProvider>
+                            }
+                        />
+                        <Route
+                            path="/pedidos/*"
+                            element={
+                                <PedidosProvider>
+                                    <PedidosModule />
+                                </PedidosProvider>
+                            }
+                        />
+
+                        {/* Redirección por defecto */}
+                        <Route path="*" element={<Navigate to="/login" replace />} />
+                    </Routes>
+
                 </Fragment>
             </AuthProvider>
         </BrowserRouter>
