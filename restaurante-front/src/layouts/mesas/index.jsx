@@ -1,41 +1,24 @@
-import MesasView from './MesasView';
+import MesasView from "./MesasView";
 import MesasForm from "./MesasForm";
-import  {Routes, Route} from 'react-router-dom';
-
+import { Routes, Route } from "react-router-dom";
 
 const MesasModule = () => {
     return (
-        
-            <Routes>
-                <Route 
-                    path="/mesas" 
-                    element={
-                        // <PrivateRoute>
-                            <MesasView/>
-                        // </PrivateRoute>
-                    } 
-                />
+        <Routes>
+            <Route 
+                path="" 
+                element={<MesasView />} 
+            />
+            <Route 
+                path="crear" 
+                element={<MesasForm />} 
+            />
+            <Route 
+                path="editar/:id" 
+                element={<MesasForm />} 
+            />
+        </Routes>
+    );
+};
 
-                <Route 
-                    path="/mesas/crear" 
-                    element={
-                        // <PrivateRoute>
-                            <MesasForm/>
-                        // </PrivateRoute>
-                    } 
-                />
-
-                <Route 
-                    path="/mesas/editar/:id" 
-                    element={
-                        // <PrivateRoute>
-                            <MesasForm />
-                        // </PrivateRoute>
-                    } 
-                /> 
-            </Routes>
-    
-    )
-}
-
-export default MesasModule
+export default MesasModule;

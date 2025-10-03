@@ -1,22 +1,15 @@
 import PedidosView from "./PedidosView";
-import  {Routes, Route} from 'react-router-dom';
-
+import { Routes, Route } from "react-router-dom";
 
 const PedidosModule = () => {
     return (
-        
-            <Routes>
-                <Route 
-                    path="/pedidos" 
-                    element={
-                        // <PrivateRoute>
-                            <PedidosView/>
-                        // </PrivateRoute>
-                    } 
-                />
-            </Routes>
-    
-    )
-}
+        <Routes>
+            <Route 
+                path="" 
+                element={<PedidosView />} 
+            />
+        </Routes>
+    );
+};
 
-export default PedidosModule
+export default PedidosModule;

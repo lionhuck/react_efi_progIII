@@ -42,34 +42,22 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-
     const login = async (credentials)=>{
         try {
             const {data, status} = await authService.login(credentials)
-
-            if(status === 200){
-                const token = data?.token
-                localStorage.setItem('token', token)
-                const userLogued = decodeUser(token)
-                notifySucces(data?.message || "Usuario logueado exitosamente");
-                if(!userLogued){
-                    localStorage.removeItem('token')
-                    alert("Token invalido o esta expirado")
-                    return
-                }
-                
-                setUser(userLogued)
-                navigate('/')
-            }else{
-                // alert('Las credenciales son erroneas')
-                notifyError(data?.message)
-            }
+            const token = data?.token
+            localStorage.setItem('token', token)
+            const base64Payload = token.split('.')[1];
+            const decodedPayload = JSON.parse(atob(base64Payload));
+            setUser({ ...decodedPayload, token });
+            navigate('/platos')
         } catch (error) {
             console.log(error);
             // alert("Hubo error al iniciar sesion")
             notifyError(error.message)
         }
     }
+
 
 
     const updateProfile = async (profileData, { redirect = false } = {}) => {
