@@ -1,42 +1,32 @@
 import { Fragment, useContext } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
+import { useNavigate } from "react-router-dom";
 
 import { PedidosContext } from "../../context/PedidosContext";
 import { AuthContext } from "../../context/AuthContext";
-import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
-import { InputText } from "primereact/inputtext";
-import { confirmDialog } from "primereact/confirmdialog";
-import { ConfirmDialog } from "primereact/confirmdialog";
-import { InputSwitch } from "primereact/inputswitch";
 
 const PedidosView = () => {
     const {
         pedidos,
-        setPedidos,
-        editingPedido,
-        setEditingPedido,
         loading,
-        setLoading,
         lazy,
         setLazy,
-        getPedidos,
-        createPedido,
         cancelPedido,
-        editPedido,
         changeEstado,
-        getPedidoById,
+        closePedido,
     } = useContext(PedidosContext);
 
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const handleEdit = (pedido) => {
-        setEditingPedido(pedido);
-        navigate(`/pedidos/editar/${pedido.id}`);
-    };
+    // Ver detalle del pedido
+    const handleVer = (id) => navigate(`/pedidos/detalle/${id}`);
 
+    // Cancelar pedido
     const handleCancel = (id) => {
         confirmDialog({
         message: "¿Está seguro que desea cancelar este pedido?",
@@ -44,43 +34,122 @@ const PedidosView = () => {
         icon: "pi pi-exclamation-triangle",
         acceptLabel: "Sí, cancelar",
         rejectLabel: "Cancelar",
-        accept: async () => {
-            await cancelPedido(id); // ✅ notify lo maneja el context
-        },
+        accept: async () => await cancelPedido(id),
         });
     };
 
-    const bodyActions = (rowData) => (
+    // Cerrar pedido (solo admin/cajero)
+    const handleClose = (id) => {
+        confirmDialog({
+        message: "¿Cerrar pedido y liberar mesa?",
+        header: "Confirmación",
+        icon: "pi pi-check-circle",
+        acceptLabel: "Sí, cerrar",
+        rejectLabel: "Cancelar",
+        accept: async () => await closePedido(id),
+        });
+    };
+
+    // Confirmar cambio de estado
+    const handleChangeEstado = (pedido) => {
+        const nextEstado = {
+        pendiente: "en preparación",
+        "en preparación": "listo",
+        listo: "servido",
+        servido: "cuenta solicitada",
+        "cuenta solicitada": "pagado",
+        }[pedido.estado];
+
+        if (!nextEstado) return;
+
+        confirmDialog({
+        message: `¿Desea avanzar el pedido de "${pedido.estado}" a "${nextEstado}"?`,
+        header: "Confirmar cambio de estado",
+        icon: "pi pi-refresh",
+        acceptLabel: "Sí, cambiar",
+        rejectLabel: "Cancelar",
+        accept: async () => await changeEstado(pedido.id, nextEstado),
+        });
+    };
+
+    // Renderizar acciones
+    const accionesTemplate = (rowData) => (
         <div className="p-d-flex p-gap-2">
-        <Button label="Editar" onClick={() => handleEdit(rowData)} />
+        {/* Ver detalle */}
+        <Button label="Ver" onClick={() => handleVer(rowData.id)} />
+
+        {/* Avanzar estado */}
+        {[
+            "pendiente",
+            "en preparación",
+            "listo",
+            "servido",
+            "cuenta solicitada",
+        ].includes(rowData.estado) && (
+            <Button
+            label="Avanzar estado"
+            icon="pi pi-arrow-right"
+            onClick={() => handleChangeEstado(rowData)}
+            />
+        )}
+
+        {/* Cancelar pedido */}
         <Button
-            label="Cancelar pedido"
+            label="Cancelar"
             severity="danger"
             onClick={() => handleCancel(rowData.id)}
         />
+
+        {/* Cerrar pedido (solo admin/cajero) */}
+        {["pagado", "cancelado"].includes(rowData.estado) && (
+            <Button
+            label="Cerrar"
+            severity="success"
+            onClick={() => handleClose(rowData.id)}
+            />
+        )}
         </div>
     );
 
-    const pedidosVisibles = pedidos?.filter(p => p.estado !== "cancelado");
+    const formatFecha = (fecha) => {
+    if (!fecha) return "-";
+    const d = new Date(fecha);
+    return isNaN(d.getTime())
+        ? "-"
+        : d.toLocaleString("es-AR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    };
 
+    // Filtrar pedidos visibles
+    const pedidosVisibles = pedidos?.filter((p) => p.estado !== "cerrado");
+
+    // Render
     return (
         <Fragment>
-        {/* Dialog de confirmación (necesario para confirmDialog) */}
         <ConfirmDialog />
 
         <h1>Listado de Pedidos</h1>
-        <span>Buscar:</span>
-        <InputText
+
+        {/*  Búsqueda */}
+        <div className="p-inputgroup mb-3">
+            <span className="p-inputgroup-addon">
+            <i className="pi pi-search" />
+            </span>
+            <InputText
             value={lazy?.q}
             onChange={(e) =>
-            setLazy({ ...lazy, q: e.target.value, first: 0, page: 0 })
+                setLazy({ ...lazy, q: e.target.value, first: 0, page: 0 })
             }
-            placeholder="Nombre del pedido"
-        />
-        {/*filtrado segun rol*/}
+            placeholder="Buscar por estado..."
+            />
+        </div>
 
-
-        {/* Tabla de datos */}
+        {/* Tabla */}
         <DataTable
             header="Pedidos"
             value={pedidosVisibles}
@@ -97,26 +166,42 @@ const PedidosView = () => {
             })
             }
             loading={loading}
-            className="custom-datatable"
             emptyMessage={
             lazy.q ? "La búsqueda no coincide" : "No hay pedidos disponibles"
             }
         >
+            {/* Fecha de creación */}
+            <Column
+                field="created_at"
+                header="Fecha creación"
+                sortable
+                body={(rowData) => formatFecha(rowData.created_at)}
+            />
             <Column field="mesaId" header="Mesa" sortable />
             <Column field="meseroId" header="Mesero" sortable />
-            <Column field="estado" header="Estado" />
+            <Column field="estado" header="Estado" sortable />
             <Column field="total" header="Total" />
-
-            {/* 👇 Bloque temporal en desarrollo (acciones y disponibilidad visibles sin control de rol) */}
+            {/* Fecha de última modificación */}
             <Column
-                header="Acciones (TEMP sin control de rol)"
-                body={bodyActions}
-                exportable={false}
-                style={{ minWidth: "8rem" }}
+                field="updated_at"
+                header="Última actualización"
+                body={(rowData) => formatFecha(rowData.updated_at)}
+            />
+            <Column
+            header="Acciones"
+            body={accionesTemplate}
+            exportable={false}
+            style={{ minWidth: "16rem" }}
             />
         </DataTable>
-         {/* 👇 temporal (sin control de rol, visible ahora en desarrollo) */}
-        <Button label="Crear pedido" onClick={() => navigate("/pedidos/crear")} />
+
+        {/* temporal (visible en desarrollo sin control de rol) */}
+        <Button
+            label="Crear pedido"
+            icon="pi pi-plus"
+            className="mt-3"
+            onClick={() => navigate("/pedidos/crear")}
+        />
         </Fragment>
     );
 };

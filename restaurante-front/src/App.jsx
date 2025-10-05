@@ -55,9 +55,13 @@ function App() {
                         <Route 
                             path="/pedidos/*" 
                             element={
-                                <PedidosProvider>
-                                    <PedidosModule />
-                                </PedidosProvider>
+                                <PlatosProvider>
+                                    <MesasProvider>
+                                        <PedidosProvider>
+                                            <PedidosModule />
+                                        </PedidosProvider>
+                                    </MesasProvider>
+                                </PlatosProvider>
                             } 
                         />
                     </Route>

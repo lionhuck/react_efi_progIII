@@ -61,7 +61,7 @@ const RegisterForm = () => {
         {({ handleChange, values, setFieldValue }) => (
           <Form className="p-fluid">
             <div className="field p-2">
-              <label htmlFor="name">Name</label>
+              <label htmlFor="name">Nombre</label>
               <InputText id="name" name="name" value={values.name} onChange={handleChange} />
               <ErrorMessage name="name" component="div" className="p-error" />
             </div>
@@ -73,20 +73,20 @@ const RegisterForm = () => {
             </div>
 
             <div className="field p-2">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Contraseña</label>
               <Password id="password" name="password" value={values.password} onChange={handleChange} />
               <ErrorMessage name="password" component="div" className="p-error" />
             </div>
 
             <div className="field p-2">
-              <label htmlFor="rol">Role</label>
+              <label htmlFor="rol">Rol</label>
               <Dropdown
                 id="rol"
                 name="rol"
                 value={values.rol}
                 options={roles}
                 onChange={(e) => setFieldValue('rol', e.value)}
-                placeholder="Select a role"
+                placeholder="Seleccione un rol"
               />
               <ErrorMessage name="rol" component="div" className="p-error" />
             </div>
