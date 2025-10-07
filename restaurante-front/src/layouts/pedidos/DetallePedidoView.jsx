@@ -93,36 +93,45 @@ const DetallePedidoView = () => {
     };
 
     // Cambiar estado del pedido (según flujo)
-    const handleChangeEstado = () => {
-        const nextEstado = {
+// Cambiar estado del pedido (según flujo)
+const handleChangeEstado = () => {
+    const nextEstado = {
         pendiente: "en preparación",
         "en preparación": "listo",
         listo: "servido",
         servido: "cuenta solicitada",
         "cuenta solicitada": "pagado",
-        }[pedido.estado];
+    }[pedido.estado];
 
-        if (!nextEstado) {
+    if (!nextEstado) {
         notifyError("No hay un siguiente estado disponible");
         return;
-        }
+    }
 
-        confirmDialog({
-        message: `¿Avanzar el pedido de "${pedido.estado}" a "${nextEstado}"?`,
+    // Mensajes personalizados según el estado
+    const mensajes = {
+        "en preparación": "¿Comenzar a preparar el pedido?",
+        listo: "¿Marcar el pedido como listo para servir?",
+        servido: "¿Confirmar que el pedido fue servido?",
+        "cuenta solicitada": "¿El cliente solicitó la cuenta?",
+        pagado: "¿Confirmar que el pedido fue pagado?",
+    };
+
+    confirmDialog({
+        message: mensajes[nextEstado] || `¿Avanzar el pedido de "${pedido.estado}" a "${nextEstado}"?`,
         header: "Confirmar cambio de estado",
         icon: "pi pi-refresh",
         acceptLabel: "Sí, cambiar",
         rejectLabel: "Cancelar",
         accept: async () => {
-            const ok = await changeEstado(pedido.id, nextEstado);
-            if (ok) {
+        const ok = await changeEstado(pedido.id, nextEstado);
+        if (ok) {
             notifySucces(`Estado cambiado a "${nextEstado}" ✅`);
             setPedido({ ...pedido, estado: nextEstado });
-            }
+        }
         },
-        });
+    });
     };
-
     // Cerrar pedido (solo cajero/admin)
     const handleClose = () => {
         confirmDialog({
